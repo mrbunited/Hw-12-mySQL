@@ -1,0 +1,24 @@
+{
+  "name": "Hw-12-mySQL",
+  "version": "1.0.0",
+  "description": "Hw-12-mySQL",
+  "main": "bamazonCustomer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mrbunited/Hw-12-mySQL.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mrbunited/Hw-12-mySQL/issues"
+  },
+  "homepage": "https://github.com/mrbunited/Hw-12-mySQL#readme",
+  "dependencies": {
+    "inquirer": "^6.1.0",
+    "mysql": "^2.16.0"
+  }
+}
