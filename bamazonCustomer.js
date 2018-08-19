@@ -1,5 +1,7 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+var Table = require('cli-table');
+var joi = require('joi');
 
 
 var connection = mysql.createConnection({
@@ -17,30 +19,45 @@ function displayInventory() {
     // Make the db query
     connection.query(queryProduct, function (err, res) {
         if (err) throw err;
-
-
-        var productTable = "";
         var productArray = [];
+        var productTable = new Table({
+            head: ['ID', 'Product Name', 'Department', 'Price $', 'Stock Quantity']
+        });
+
+        console.log("===========================================");
+        console.log("This is what we have for sale");
+        console.log("===========================================");
+
         for (var i = 0; i < res.length; i++) {
-            productTable = '';
-            productTable += 'Item ID: ' + res[i].id + '   ';
-            productTable += 'Product Name: ' + res[i].name + '    ';
-            productTable += 'Department: ' + res[i].department_name + '    ';
-            productTable += 'Left in stock: ' + res[i].stock_quantity + '  ||  ';
-            productTable += 'Price: $' + res[i].price;
-
-            productArray.push(productTable);
-            console.log("This is what we have for sale");
-            console.log("===========================================");
-            console.log(productTable);
+            productTable.push([res[i].id, res[i].name, res[i].department_name, res[i].price, res[i].stock_quantity]);
+            
         }
+console.log(productTable.toString());
+        console.log("===========================================");
 
-        inquirer.prompt([
+
+// Another way to show the table.
+
+            // var productTable = "";
+            // var productArray = [];  
+            // for (var i = 0; i < res.length; i++) {
+            //     productTable = '';
+            //     productTable += 'Item ID: ' + res[i].id + '   ';
+            //     productTable += 'Product Name: ' + res[i].name + '    ';
+            //     productTable += 'Department: ' + res[i].department_name + '    ';
+            //     productTable += 'Left in stock: ' + res[i].stock_quantity + '  ||  ';
+            //     productTable += 'Price: $' + res[i].price;
+            // productArray.push(productTable);
+            // console.log(productTable);
+
+
+inquirer.prompt([
             {
                 type: "input",
                 name: "selectproduct",
-                message: "What do you wnt to buy? Use item id.",
-                choices: productArray
+                message: "What do you want to buy? Use item id.",
+                validate: validateValue
+                // choices: productArray
             },
             {
                 type: "integer",
@@ -66,15 +83,16 @@ function displayInventory() {
 
 
                 if (stockQuantity >= customerQuantity) {
-
+                    console.log("+++++++++++++++++++++++++++++++++++++++++++++++");
                     console.log("Selected item(s) added to the cart.");
                     connection.query(
                         "UPDATE products SET ? WHERE ?", [{ stock_quantity: newQuantity }, { id: item }], function (err) {
                             if (err) throw err;
                         });
 
-                    console.log("Your purchase total is : " + totalCost);
+                    console.log("Your purchase total is : $" + totalCost);
                     console.log("Thank you for shopping with us")
+                    console.log("+++++++++++++++++++++++++++++++++++++++++++++++");
                     buyMore();
                 }
 
@@ -132,3 +150,20 @@ function runBamazon() {
 
 
 runBamazon();
+
+
+function validateValue (value) {
+    var valid;
+    joi.validate(value, joi.number().required().min(1).max(10), function(err,val){
+        if (err){
+        
+            console.log("    ERROR!!!   Please select a valid product id");
+        
+        }
+        else{
+            valid = true;
+        }
+        
+    });
+    return valid;
+}
